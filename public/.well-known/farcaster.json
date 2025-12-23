@@ -1,18 +1,18 @@
 {
   "accountAssociation": {
-    "header": "PASTE_HEADER_HERE",
-    "payload": "PASTE_PAYLOAD_HERE",
-    "signature": "PASTE_SIGNATURE_HERE"
+    "header": "eyJmaWQiOjU0NDA2NSwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDc1ZWQ4OTE3MjE1ZjlkODc3MDJGMzk5NTIxRjhjNUQ2ZWQ1RTRFOTgifQ",
+    "payload": "eyJkb21haW4iOiJzYW50YS1wcm90b2NvbC52ZXJjZWwuYXBwIn0",
+    "signature": "JzbfVR5fs7CtTutHkv+kF6k6nedS4TZuoHIQmR76ZesIoghamRxqLXNabFJ6kCXA6Xr06g5/PF9s1mWoBcsZJBs="
   },
   "frame": {
     "version": "1",
     "name": "Santa Protocol",
     "homeUrl": "https://santa-protocol.vercel.app",
-    "iconUrl": "https://santa-protocol.vercel.app/icon.png",
+    "iconUrl": "https://i.postimg.cc/gJ5KL4FJ/sanatlogo.jpg",
     "splashImageUrl": "https://santa-protocol.vercel.app/splash.png",
     "splashBackgroundColor": "#034F1B",
     "imageUrl": "https://santa-protocol.vercel.app/og-image.png",
-    "buttonTitle": "Launch Santa",
-    "webhookUrl": "https://santa-protocol.vercel.app/api/webhook"
+    "buttonTitle": "🎁 Open My Gift",
+    "webhookUrl": "https://api.neynar.com/f/app/2fb96a14-a120-47c6-a327-5fd352f831e2/event"
   }
 }
