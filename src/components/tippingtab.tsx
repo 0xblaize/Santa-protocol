@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import sdk from '@farcaster/frame-sdk';
+import sdk from '@farcaster/frame-sdk'; // 👈 Using the correct v2 SDK
 import { parseEther, getAddress } from "viem";
 import { useAccount, useSendTransaction } from 'wagmi';
 import { base } from "wagmi/chains";
@@ -23,9 +23,6 @@ export default function TippingTab({ user }: { user: any }) {
   const [friends, setFriends] = useState<FarcasterUser[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // 🎅 YOUR RECIPIENT ADDRESS (The Santa Treasury)
-  const TREASURY_ADDRESS = "0x6DBB76BC3BB345b567B369563EF1DC1Cd04d5569";
-
   // 1. Fetch "Active" Mutuals from your API
   const fetchRealEngagers = async () => {
     if (!user?.fid) return;
@@ -36,7 +33,6 @@ export default function TippingTab({ user }: { user: any }) {
       if (!response.ok) throw new Error("Neynar Fetch Failed");
       const data = await response.json();
       
-      // The API now returns a list of active users
       setFriends(data);
     } catch (e) {
       console.error("Neynar API Error:", e);
@@ -45,23 +41,25 @@ export default function TippingTab({ user }: { user: any }) {
     }
   };
 
-  // 2. Handle Gifting (Tipping)
-  const handleTip = (friend?: FarcasterUser) => {
+  // 2. Handle Tipping
+  const handleTip = (friend: FarcasterUser) => {
     if (!isConnected) {
       alert("Please connect your wallet in Warpcast.");
       return;
     }
 
-    // Determine target: Use friend's verified address if it exists, otherwise use Treasury
-    let target = TREASURY_ADDRESS;
-    if (friend) {
-      target = friend.verified_addresses?.eth_addresses?.[0] || friend.custody_address || TREASURY_ADDRESS;
+    // Determine target from Neynar user data
+    const target = friend.verified_addresses?.eth_addresses?.[0] || friend.custody_address;
+
+    if (!target) {
+      alert("No wallet found for this user.");
+      return;
     }
 
     try {
       sendTransaction({
         to: getAddress(target),
-        value: parseEther("0.001"), // Amount to gift
+        value: parseEther("0.001"), 
         chainId: base.id,
       });
     } catch (err) {
@@ -71,28 +69,14 @@ export default function TippingTab({ user }: { user: any }) {
 
   return (
     <div className="flex flex-col gap-6 p-2">
-      {/* 🎁 Main Donation Card */}
-      <div className="bg-[#E6DCB1] p-6 rounded-[2.5rem] text-[#034F1B] border-b-8 border-[#CEAC5C] text-center shadow-xl">
-        <h2 className="text-xl font-black italic uppercase text-[#7E121D]">Santa Protocol</h2>
-        <p className="text-[10px] font-bold opacity-70 mb-4 uppercase">Support the 2025 Nice List</p>
-        
-        <button 
-          onClick={() => handleTip()}
-          disabled={isPending}
-          className="w-full bg-[#7E121D] text-white py-4 rounded-2xl font-black uppercase text-sm shadow-lg active:scale-95 transition-all disabled:opacity-50"
-        >
-          {isPending ? "Confirming..." : "🎁 Donate to Santa Pool"}
-        </button>
-      </div>
-
-      {/* 📜 The Nice List (Engagement Based) */}
+      {/* 📜 The Nice List (Tipping Only) */}
       <div className="bg-white/5 p-4 rounded-3xl border border-white/10">
         <button 
           onClick={fetchRealEngagers}
           disabled={isGenerating}
           className="w-full bg-[#034F1B] text-[#E6DCB1] py-3 rounded-xl font-bold text-xs uppercase mb-4 flex items-center justify-center gap-2"
         >
-          {isGenerating ? "🔍 ANALYZING ENGAGEMENT..." : "📜 Load My Nice List"}
+          {isGenerating ? "🔍 ANALYZING..." : "📜 Load My Nice List"}
         </button>
 
         <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-1">
@@ -115,16 +99,16 @@ export default function TippingTab({ user }: { user: any }) {
               </div>
               <button 
                 onClick={() => handleTip(friend)} 
-                className="bg-[#CEAC5C] text-[#034F1B] px-4 py-2 rounded-lg text-[10px] font-black uppercase hover:bg-white transition-colors"
+                className="bg-[#CEAC5C] text-[#034F1B] px-4 py-2 rounded-lg text-[10px] font-black uppercase"
               >
-                Gift
+                Tip
               </button>
             </div>
           ))}
           
           {friends.length === 0 && !isGenerating && (
             <div className="py-8 text-center">
-              <p className="text-[10px] text-white/30 italic uppercase">Your list is empty. Click load!</p>
+              <p className="text-[10px] text-white/40 italic uppercase">Your list is empty.</p>
             </div>
           )}
         </div>
