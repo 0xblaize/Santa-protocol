@@ -1,27 +1,23 @@
 import { NeynarAPIClient, Configuration } from "@neynar/nodejs-sdk";
 
-/**
- * 🎅 Environment Variable Setup
- * On Vercel, this will pull from the settings you just added.
- */
+// 🎅 Setup the API Key from your .env
 const apiKey = process.env.NEYNAR_API_KEY || process.env.NEXT_PUBLIC_NEYNAR_API_KEY || "";
 
 const config = new Configuration({
   apiKey: apiKey,
 });
 
-// Primary client instance
+// This is the core client
 export const neynarClient = new NeynarAPIClient(config);
 
 /**
- * ✅ FIX FOR AUTH ERROR: 
- * This creates the missing link for your Auth and Signer routes.
+ * ✅ FIX: This function is required by your Auth and Signer routes.
+ * It simply returns the client instance they are looking for.
  */
 export const getNeynarClient = () => neynarClient;
 
 /**
- * ✅ FIX FOR OG-IMAGE ERROR: 
- * Fetches a single user's profile data.
+ * ✅ FIX: Used by OpenGraph and Profile lookups
  */
 export async function getNeynarUser(fid: number) {
   if (!fid) return null;
@@ -35,28 +31,26 @@ export async function getNeynarUser(fid: number) {
 }
 
 /**
- * 🎄 XMAS GIFTING LOGIC: 
- * Fetches users who have interacted with the target FID.
+ * 🎄 XMAS GIFTING LOGIC: Fetches the "Nice List"
  */
 export async function getXmasGiftingList(fid: number) {
   if (!fid) return [];
 
   try {
-    // Cast to 'any' to handle varying SDK method signatures across versions
+    // Cast to 'any' ensures compatibility across different SDK v2 versions
     const response = await (neynarClient as any).fetchUserInteractions({
       fids: fid.toString(),
     });
 
-    // Extract users from the nested response structure (V2)
     const users = response.result?.users || response.users || [];
 
-    // Filter for users who have a verified wallet connected to Farcaster
+    // Return users who have at least one verified wallet
     return users.filter((user: any) => 
       (user.verifications && user.verifications.length > 0) || 
       (user.verified_addresses?.eth_addresses && user.verified_addresses.eth_addresses.length > 0)
     );
   } catch (error) {
-    console.error("Xmas Gifting List Engine Error:", error);
+    console.error("Neynar Engine Error:", error);
     return [];
   }
 }
