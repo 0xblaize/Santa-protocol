@@ -5,6 +5,8 @@ export async function GET(req: Request) {
   const fid = searchParams.get('fid');
   const apiKey = process.env.NEYNAR_API_KEY;
 
+console.log("DEBUG: Is API Key present?", !!apiKey); // 🎅 This will show 'true' or 'false' in Vercel logs
+
   if (!fid || !apiKey) return NextResponse.json({ error: "Setup incomplete" }, { status: 400 });
 
   try {
