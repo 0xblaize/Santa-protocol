@@ -5,29 +5,33 @@ export async function GET(req: Request) {
   const fid = searchParams.get('fid');
   const apiKey = process.env.NEYNAR_API_KEY;
 
+  // 1. Safety check for Key and FID
   if (!fid || !apiKey) return NextResponse.json([]);
 
   try {
-    // 🎅 Simplified to a single fast fetch to avoid timeouts and 202 status
+    // 2. Use the standard followers endpoint (more reliable than reciprocal for testing)
     const response = await fetch(
-      `https://api.neynar.com/v2/farcaster/followers?fid=${fid}&limit=10`, 
+      `https://api.neynar.com/v2/farcaster/followers?fid=${fid}&limit=20`, 
       { 
-        headers: { 'x-api-key': apiKey },
-        cache: 'no-store' // 🎅 Forces the server to get fresh data
+        method: 'GET',
+        headers: { 
+          'accept': 'application/json',
+          'x-api-key': apiKey 
+        },
+        cache: 'no-store' 
       }
     );
 
     const data = await response.json();
     
-    // 🎅 Forces the browser to ignore the '304' cache
-    return new NextResponse(JSON.stringify(data.users || []), {
-      status: 200,
+    // 3. Return the users with a cache-buster header
+    return NextResponse.json(data.users || [], {
       headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-      },
+        'Cache-Control': 'no-store, max-age=0',
+      }
     });
   } catch (error) {
+    console.error("Santa API Error:", error);
     return NextResponse.json([]);
   }
 }
