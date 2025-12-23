@@ -1,18 +1,15 @@
 {
   "accountAssociation": {
-    "header": "PASTE_HEADER_HERE",
-    "payload": "PASTE_PAYLOAD_HERE",
-    "signature": "PASTE_SIGNATURE_HERE"
+    "header": "PASTE_FROM_TOOL",
+    "payload": "PASTE_FROM_TOOL",
+    "signature": "PASTE_FROM_TOOL"
   },
   "frame": {
     "version": "1",
     "name": "Santa Protocol",
-    "homeUrl": "https://santa-protocol.vercel.app",
-    "iconUrl": "https://santa-protocol.vercel.app/icon.png",
-    "splashImageUrl": "https://santa-protocol.vercel.app/splash.png",
-    "splashBackgroundColor": "#034F1B",
-    "imageUrl": "https://santa-protocol.vercel.app/og-image.png",
-    "buttonTitle": "Launch Santa",
-    "webhookUrl": "https://santa-protocol.vercel.app/api/webhook"
+    "homeUrl": "https://your-app.vercel.app",
+    "iconUrl": "https://your-app.vercel.app/icon.png",
+    "splashImageUrl": "https://your-app.vercel.app/splash.png",
+    "splashBackgroundColor": "#034F1B"
   }
 }
