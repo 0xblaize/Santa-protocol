@@ -5,40 +5,40 @@ export async function GET(req: Request) {
   const fid = searchParams.get('fid');
   const apiKey = process.env.NEYNAR_API_KEY;
 
-  if (!fid) return NextResponse.json({ error: "No FID provided" }, { status: 400 });
-  if (!apiKey) {
-    console.error("❌ NEYNAR_API_KEY is missing from environment variables");
-    return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
-  }
+  if (!fid || !apiKey) return NextResponse.json({ error: "Setup incomplete" }, { status: 400 });
 
   try {
-    // 🎅 Fetching Reciprocal (Mutuals) and Followers
-    const [mutualsResponse, followersResponse] = await Promise.all([
-      fetch(`https://api.neynar.com/v2/farcaster/followers/reciprocal?fid=${fid}&limit=5`, 
-        { headers: { 'api_key': apiKey } }),
-      fetch(`https://api.neynar.com/v2/farcaster/followers?fid=${fid}&limit=10`, 
-        { headers: { 'api_key': apiKey } })
-    ]);
+    // 🎅 STEP 1: Get Popular Casts to find "Engagers"
+    // This finds the users who liked/recasted your best content
+    const popularCastsResponse = await fetch(
+      `https://api.neynar.com/v2/farcaster/feed/user/popular?fid=${fid}`,
+      { headers: { 'api_key': apiKey } }
+    );
+    const popularData = await popularCastsResponse.json();
 
-    // Check if Neynar is rejecting the request
-    if (mutualsResponse.status === 401 || followersResponse.status === 401) {
-      console.error("❌ Neynar API Key is invalid");
-      return NextResponse.json({ error: "Invalid API Key" }, { status: 401 });
-    }
+    // 🎅 STEP 2: Get Active Followers
+    // This ensures we aren't tipping bots or dead accounts
+    const followersResponse = await fetch(
+      `https://api.neynar.com/v2/farcaster/followers?fid=${fid}&sort_type=descending&limit=20`,
+      { headers: { 'api_key': apiKey } }
+    );
+    const followersData = await followersResponse.json();
 
-    const [mJSON, fJSON] = await Promise.all([
-      mutualsResponse.json(),
-      followersResponse.json()
-    ]);
-
-    const combined = [...(mJSON.users || []), ...(fJSON.users || [])];
+    // 🎅 STEP 3: Merge & Filter
+    // We prioritize people who are in both lists (Active + Followers)
+    const allUsers = [...(followersData.users || [])];
     
-    // De-duplicate by FID
-    const uniqueList = Array.from(new Map(combined.map(u => [u.fid, u])).values());
+    // Filter for "Active" status only
+    const activeUsers = allUsers.filter(u => u.active_status === 'active');
 
-    return NextResponse.json(uniqueList.slice(0, 10));
+    // If active list is too short, use the general list
+    const finalSelection = activeUsers.length > 0 ? activeUsers : allUsers;
+
+    // Return the top 10 "Nice" users
+    return NextResponse.json(finalSelection.slice(0, 10));
+
   } catch (error) {
-    console.error("Fetch error:", error);
-    return NextResponse.json({ error: "Failed to fetch from Neynar" }, { status: 500 });
+    console.error("Santa API Error:", error);
+    return NextResponse.json([]);
   }
 }
