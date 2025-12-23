@@ -1,24 +1,30 @@
 "use client";
 import React, { useState } from 'react';
-import { sdk } from '@farcaster/miniapp-sdk';
-import { parseEther } from "viem";
-import { useAccount } from 'wagmi';
+import sdk from '@farcaster/frame-sdk'; // 👈 NEW SDK
+import { parseEther, getAddress } from "viem";
+import { useAccount, useSendTransaction } from 'wagmi'; // 👈 Use Wagmi for cleaner tips
+import { base } from "wagmi/chains";
 
 export default function TippingTab({ user }: { user: any }) {
   const { address } = useAccount();
+  const { sendTransaction } = useSendTransaction();
   const [friends, setFriends] = useState<any[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // 🎅 Change this to your Treasury Address or the Friend's address
+  const TREASURY_ADDRESS = "0x6DBB76BC3BB345b567B369563EF1DC1Cd04d5569";
 
   const fetchRealEngagers = async () => {
     if (!user?.fid) return;
     setIsGenerating(true);
     
     try {
-      // 🎅 Calling our new API route
+      // 🎅 This MUST match your file path in src/app/api/farcaster/wrapped/route.ts
       const response = await fetch(`/api/farcaster/wrapped?fid=${user.fid}`);
+      if (!response.ok) throw new Error("API Failed");
+      
       const data = await response.json();
       
-      // We map the real Neynar data to our list
       setFriends(data.map((u: any) => ({
         fid: u.fid,
         username: u.username,
@@ -27,29 +33,27 @@ export default function TippingTab({ user }: { user: any }) {
         reason: "Top Engager"
       })));
 
-      sdk.haptics.notificationOccurred('success');
     } catch (e) {
       console.error("Failed to fetch real mutuals", e);
+      // Fallback for testing if API fails
+      alert("Make sure NEYNAR_API_KEY is in Vercel!");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const handleTip = async (friend: any) => {
-    if (!address) return;
-    try {
-      const provider = await sdk.wallet.getEthereumProvider();
-      await provider?.request({
-        method: 'eth_sendTransaction',
-        params: [{
-          from: address as `0x${string}`,
-          to: "0x6DBB76BC3BB345b567B369563EF1DC1Cd04d5569" as `0x${string}`, 
-          value: parseEther("0.001").toString() as `0x${string}`,
-          chainId: "0x2105", 
-        }]
-      });
-      sdk.haptics.notificationOccurred('success');
-    } catch (err) { console.error(err); }
+  const handleTip = (friend: any) => {
+    if (!address) {
+       alert("Please connect your wallet first");
+       return;
+    }
+
+    // 🎅 Using Wagmi is much safer than the raw provider
+    sendTransaction({
+      to: getAddress(TREASURY_ADDRESS), // Using your treasury for now
+      value: parseEther("0.001"),
+      chainId: base.id,
+    });
   };
 
   return (
@@ -69,7 +73,7 @@ export default function TippingTab({ user }: { user: any }) {
 
       <div className="flex flex-col gap-3 pb-20">
         {friends.map((friend) => (
-          <div key={friend.fid} className="bg-white/5 p-4 rounded-[2rem] border border-white/10 flex items-center justify-between animate-in fade-in slide-in-from-bottom-2">
+          <div key={friend.fid} className="bg-white/5 p-4 rounded-[2rem] border border-white/10 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img src={friend.pfp} className="w-10 h-10 rounded-full border border-white/20" alt={friend.username} />
               <div>
