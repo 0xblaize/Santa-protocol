@@ -43,7 +43,7 @@ export default function TippingTab({ user }: { user: any }) {
         method: 'eth_sendTransaction',
         params: [{
           from: address as `0x${string}`,
-          to: "0xYOUR_TREASURY_WALLET" as `0x${string}`, 
+          to: "0x6DBB76BC3BB345b567B369563EF1DC1Cd04d5569" as `0x${string}`, 
           value: parseEther("0.001").toString() as `0x${string}`,
           chainId: "0x2105", 
         }]
