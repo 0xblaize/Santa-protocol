@@ -1,10 +1,10 @@
 {
-  "accountAssociation": {
-    "header": "eyJmaWQiOjU0NDA2NSwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDc1ZWQ4OTE3MjE1ZjlkODc3MDJGMzk5NTIxRjhjNUQ2ZWQ1RTRFOTgifQ",
-    "payload": "eyJkb21haW4iOiJzYW50YS1wcm90b2NvbC52ZXJjZWwuYXBwIn0",
-    "signature": "JzbfVR5fs7CtTutHkv+kF6k6nedS4TZuoHIQmR76ZesIoghamRxqLXNabFJ6kCXA6Xr06g5/PF9s1mWoBcsZJBs="
-  },
-  "frame": {
+"accountAssociation": {
+  "header": "eyJmaWQiOjU0NDA2NSwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDc1ZWQ4OTE3MjE1ZjlkODc3MDJGMzk5NTIxRjhjNUQ2ZWQ1RTRFOTgifQ",
+  "payload": "eyJkb21haW4iOiJzYW50YS1wcm90b2NvbC52ZXJjZWwuYXBwIn0",
+  "signature": "uA8aeUT7cV38oYRti54oKBj9QUP7CkML4773Gs92IxUeuEMFSpA3eP9LJh9+YTTAnjAKdALTy6blatKMBQ+tsBs="
+},
+"frame": {
     "version": "1",
     "name": "Santa Protocol",
     "homeUrl": "https://santa-protocol.vercel.app",
