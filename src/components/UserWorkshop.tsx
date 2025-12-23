@@ -21,7 +21,7 @@ export default function UserWorkshop({ user }: { user: any }) {
       {/* MAIN CONTENT - scrollable */}
       <main className="flex-1 overflow-y-auto p-6 pb-32">
         {activeTab === 'tipping' && <TippingTab user={user} />}
-        {activeTab === 'pool' && <PoolTab user={user} />}
+        {activeTab === 'pool' && <PoolTab />}
         {activeTab === 'profile' && <ProfileTab user={user} />}
         {activeTab === 'admin' && isAdmin && <AdminDashboard setActiveTab={setActiveTab} />}
       </main>
