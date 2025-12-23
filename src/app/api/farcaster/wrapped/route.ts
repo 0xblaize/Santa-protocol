@@ -8,22 +8,24 @@ export async function GET(req: Request) {
   if (!fid || !apiKey) return NextResponse.json([]);
 
   try {
-    // 🎅 Simplified: One single fast call to get followers
-    // This removes the heavy loops that are causing the 30-second delay
+    // 🎅 One single, direct call. No loops, no timeouts.
     const response = await fetch(
-      `https://api.neynar.com/v2/farcaster/followers?fid=${fid}&limit=20`, 
+      `https://api.neynar.com/v2/farcaster/followers?fid=${fid}&limit=10`, 
       { 
         headers: { 
           'accept': 'application/json',
           'x-api-key': apiKey 
-        } 
+        },
+        cache: 'no-store' // This stops the "304" and "empty" caching issues
       }
     );
 
     const data = await response.json();
     
-    // Return the users array directly - this will be fast and reliable
-    return NextResponse.json(data.users || []);
+    // Return the list instantly
+    return NextResponse.json(data.users || [], {
+      headers: { 'Cache-Control': 'no-store, max-age=0' }
+    });
   } catch (error) {
     console.error("Santa API Error:", error);
     return NextResponse.json([]);
