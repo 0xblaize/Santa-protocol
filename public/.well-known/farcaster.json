@@ -1,0 +1,17 @@
+{
+  "accountAssociation": {
+    "header": "eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ",
+    "payload": "eyJkb21haW4iOiJldmVyeWJvZHktaW50cm8taHlicmlkLW1vZGVyYXRvcnMudHJ5Y2xvdWRmbGFyZS5jb20ifQ",
+    "signature": "MHcCAQEEIN6..." 
+  },
+  "frame": {
+    "version": "1",
+    "name": "Santa Protocol",
+    "homeUrl": "https://everybody-intro-hybrid-moderators.trycloudflare.com",
+    "iconUrl": "https://everybody-intro-hybrid-moderators.trycloudflare.com/icon.png",
+    "imageUrl": "https://everybody-intro-hybrid-moderators.trycloudflare.com/og-image.png",
+    "buttonTitle": "Join the Nice List",
+    "splashImageUrl": "https://everybody-intro-hybrid-moderators.trycloudflare.com/splash.png",
+    "splashBackgroundColor": "#034F1B"
+  }
+}
