@@ -8,26 +8,26 @@ export async function GET(req: Request) {
   if (!fid || !apiKey) return NextResponse.json([]);
 
   try {
-    // 🎅 One single, direct call. No loops, no timeouts.
+    // 🎅 Simplified to a single fast fetch to avoid timeouts and 202 status
     const response = await fetch(
       `https://api.neynar.com/v2/farcaster/followers?fid=${fid}&limit=10`, 
       { 
-        headers: { 
-          'accept': 'application/json',
-          'x-api-key': apiKey 
-        },
-        cache: 'no-store' // This stops the "304" and "empty" caching issues
+        headers: { 'x-api-key': apiKey },
+        cache: 'no-store' // 🎅 Forces the server to get fresh data
       }
     );
 
     const data = await response.json();
     
-    // Return the list instantly
-    return NextResponse.json(data.users || [], {
-      headers: { 'Cache-Control': 'no-store, max-age=0' }
+    // 🎅 Forces the browser to ignore the '304' cache
+    return new NextResponse(JSON.stringify(data.users || []), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      },
     });
   } catch (error) {
-    console.error("Santa API Error:", error);
     return NextResponse.json([]);
   }
 }
