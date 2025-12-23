@@ -16,15 +16,7 @@ export default function UserWorkshop({ user }: { user: any }) {
     <div className="flex flex-col bg-[#034F1B] h-screen text-[#E6DCB1] overflow-hidden">
       
       {/* HEADER */}
-      <header className="p-4 border-b border-[#CEAC5C]/20 flex justify-between items-center bg-[#023a14] shrink-0">
-        <h1 className="text-sm font-black italic uppercase tracking-tighter">
-          Santa <span className="text-[#BD3634]">Protocol</span>
-        </h1>
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span className="text-[10px] font-bold opacity-60">BASE MAINNET</span>
-        </div>
-      </header>
+      
 
       {/* MAIN CONTENT - scrollable */}
       <main className="flex-1 overflow-y-auto p-6 pb-32">
