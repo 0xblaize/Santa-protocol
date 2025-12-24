@@ -5,11 +5,13 @@ export async function GET(req: Request) {
   const fid = searchParams.get('fid');
   const apiKey = process.env.NEYNAR_API_KEY;
 
-  // 1. Safety check for Key and FID
-  if (!fid || !apiKey) return NextResponse.json([]);
+  // 1. Check if key is actually there
+  if (!fid || !apiKey) {
+    return NextResponse.json([]);
+  }
 
   try {
-    // 2. Use the standard followers endpoint (more reliable than reciprocal for testing)
+    // 2. Use 'x-api-key' for Neynar V2
     const response = await fetch(
       `https://api.neynar.com/v2/farcaster/followers?fid=${fid}&limit=20`, 
       { 
@@ -24,7 +26,7 @@ export async function GET(req: Request) {
 
     const data = await response.json();
     
-    // 3. Return the users with a cache-buster header
+    // 3. Return users array. If empty, Neynar found no followers for this FID.
     return NextResponse.json(data.users || [], {
       headers: {
         'Cache-Control': 'no-store, max-age=0',
