@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import sdk from '@farcaster/frame-sdk'; // 👈 Using the correct v2 SDK
+import React, { useState } from 'react';
+import sdk from '@farcaster/frame-sdk'; 
 import { parseEther, getAddress } from "viem";
 import { useAccount, useSendTransaction } from 'wagmi';
 import { base } from "wagmi/chains";
@@ -18,18 +18,19 @@ interface FarcasterUser {
 }
 
 export default function TippingTab({ user }: { user: any }) {
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const { sendTransaction, isPending } = useSendTransaction();
   const [friends, setFriends] = useState<FarcasterUser[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // 1. Fetch "Active" Mutuals from your API
+  // 1. Fetch Followers from your simplified API
   const fetchRealEngagers = async () => {
     if (!user?.fid) return;
     setIsGenerating(true);
     
     try {
-      const response = await fetch(`/api/farcaster/wrapped?fid=${user.fid}`);
+      // Adding a timestamp prevents the '304 Not Modified' browser cache issue
+      const response = await fetch(`/api/farcaster/wrapped?fid=${user.fid}&t=${Date.now()}`);
       if (!response.ok) throw new Error("Neynar Fetch Failed");
       const data = await response.json();
       
@@ -41,14 +42,14 @@ export default function TippingTab({ user }: { user: any }) {
     }
   };
 
-  // 2. Handle Tipping
+  // 2. Handle Tipping (Native v2 SDK Flow)
   const handleTip = (friend: FarcasterUser) => {
     if (!isConnected) {
-      alert("Please connect your wallet in Warpcast.");
+      sdk.actions.addFrame(); // Prompt to add frame/connect if not connected
       return;
     }
 
-    // Determine target from Neynar user data
+    // Priority: Verified ETH Address > Custody Address
     const target = friend.verified_addresses?.eth_addresses?.[0] || friend.custody_address;
 
     if (!target) {
@@ -74,9 +75,9 @@ export default function TippingTab({ user }: { user: any }) {
         <button 
           onClick={fetchRealEngagers}
           disabled={isGenerating}
-          className="w-full bg-[#034F1B] text-[#E6DCB1] py-3 rounded-xl font-bold text-xs uppercase mb-4 flex items-center justify-center gap-2"
+          className="w-full bg-[#034F1B] text-[#E6DCB1] py-3 rounded-xl font-bold text-xs uppercase mb-4 flex items-center justify-center gap-2 transition-transform active:scale-95"
         >
-          {isGenerating ? "🔍 ANALYZING..." : "📜 Load My Nice List"}
+          {isGenerating ? "🔍 LOADING..." : "📜 Load My Nice List"}
         </button>
 
         <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-1">
@@ -84,7 +85,11 @@ export default function TippingTab({ user }: { user: any }) {
             <div key={friend.fid} className="flex items-center justify-between bg-black/40 p-3 rounded-2xl border border-white/5 hover:border-[#CEAC5C]/50 transition-colors">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <img src={friend.pfp_url} className="w-10 h-10 rounded-full border border-[#CEAC5C]" alt={friend.username} />
+                  <img 
+                    src={friend.pfp_url || 'https://wrpcd.net/cdn-cgi/image/fit=contain,f=auto,w=144/https%3A%2F%2Fi.imgur.com%2F8QK97vD.png'} 
+                    className="w-10 h-10 rounded-full border border-[#CEAC5C]" 
+                    alt={friend.username} 
+                  />
                   {friend.active_status === 'active' && (
                     <span className="absolute -top-1 -right-1 flex h-3 w-3">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -92,16 +97,17 @@ export default function TippingTab({ user }: { user: any }) {
                     </span>
                   )}
                 </div>
-                <div>
+                <div className="overflow-hidden">
                   <p className="text-[11px] font-bold text-white truncate w-24">{friend.display_name}</p>
-                  <p className="text-[9px] text-[#CEAC5C]">@{friend.username}</p>
+                  <p className="text-[9px] text-[#CEAC5C] truncate">@{friend.username}</p>
                 </div>
               </div>
               <button 
                 onClick={() => handleTip(friend)} 
-                className="bg-[#CEAC5C] text-[#034F1B] px-4 py-2 rounded-lg text-[10px] font-black uppercase"
+                disabled={isPending}
+                className="bg-[#CEAC5C] text-[#034F1B] px-4 py-2 rounded-lg text-[10px] font-black uppercase hover:bg-white active:scale-90 transition-all disabled:opacity-50"
               >
-                Tip
+                {isPending ? "..." : "Tip"}
               </button>
             </div>
           ))}
