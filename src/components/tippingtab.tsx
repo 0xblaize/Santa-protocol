@@ -77,7 +77,7 @@ export default function TippingTab({ user }: { user: any }) {
           disabled={isGenerating}
           className="w-full bg-[#034F1B] text-[#E6DCB1] py-3 rounded-xl font-bold text-xs uppercase mb-4 flex items-center justify-center gap-2 transition-transform active:scale-95"
         >
-          {isGenerating ? "🔍 LOADING..." : "📜 Load My Nice List"}
+          {isGenerating ? "🔍 LOADING..." : "📜 Load My Tipping List"}
         </button>
 
         <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-1">
